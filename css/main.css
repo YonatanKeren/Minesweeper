@@ -9,3 +9,19 @@ body {
 .board-container {
     margin: auto;
 }
+
+.board {
+    border-collapse: collapse;
+}
+
+.cell{
+    width: 30px;  /* Adjust size as needed */
+    height: 30px; 
+    border: 1px solid black;  /* Adds a visible border */
+}
+
+
+
+
+
+
