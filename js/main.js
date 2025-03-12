@@ -1,29 +1,41 @@
 'use strict'
 
+const elBtn = document.querySelector('.btn-restart')
+const elTimer = document.querySelector('.timer')
 const MINE = '💣'
 const MARKED = '🚩'
+const PLAYING = '🙂'
+const WIN = '😎'
+const LOSE = '😵'
 
 const gGame = {
-    score: 0,
     isOn: false,
     revealedCount: 0,
     markedCount: 0,
-    secsPassed: 0
+    secsPassed: 0,
+    minesRemaining: 999
 }
 
 var gLevel = {
-    size: 4,
+    size: 5,
     mines: 2
 }
 
 var gBoard
 
 function onInit() {
+    elBtn.textContent = PLAYING
+    gGame.secsPassed = 0
     gGame.isOn = true
-    gBoard = buildBoard()  
+    gGame.minesRemaining = gLevel.mines
+    toggleBoard(gGame.isOn)
+    gBoard = buildBoard()
     setMinesNegsCount(gBoard)
     renderBoard(gBoard)
+    updateMinesRemaining()
 }
+//timer deactivated because its annoying to look at while working
+//setInterval(timer, 1000)
 
 function buildBoard() {
     const size = gLevel.size
@@ -42,7 +54,6 @@ function buildBoard() {
             board[i][j] = cell
         }
     }
-    console.table(board)
     return board
 }
 
@@ -62,13 +73,13 @@ function setMinesNegsCount(board) {
 }
 //actually apply the neighbors function to every mine
 function setMineNegsCount(cell, rows, cols, board) {
-    const col = cell.i
-    const row = cell.j
+    const row = cell.i
+    const col = cell.j
     var countNegMines = 0
-    for (var i = col - 1; i < col + 2; i++) {
+    for (var i = row - 1; i < row + 2; i++) {
         if (i < 0 || i >= cols) continue
-        for (var j = row - 1; j < row + 2; j++) {
-            if (i == col && j == row) continue
+        for (var j = col - 1; j < col + 2; j++) {
+            if (i == row && j == col) continue
             if (j < 0 || j >= rows) continue
             var currCell = board[i][j]
             if (currCell.isMine) countNegMines++
@@ -99,13 +110,18 @@ function onCellClicked(elCell, i, j) {
     const cell = gBoard[i][j]
     if (!cell.isCovered || cell.isMarked) return
     cell.isCovered = false
+    elCell.classList.add('uncovered')
     if (cell.isMine) {
         elCell.textContent = MINE
-        return gameOver()
+        return checkGameOver(cell)
     }
-    else{
-        elCell.textContent = cell.minesAroundCount.toString()
-}
+    else {
+        if (cell.minesAroundCount === 0) {
+            expandReveal(gBoard, elCell, i, j)
+        } else {
+            elCell.textContent = cell.minesAroundCount.toString()
+        }
+    }
 }
 
 //disabling context menu and applying cell mark afterwards
@@ -121,13 +137,53 @@ function onCellMarked(elCell, i, j) {
     if (!cell.isMarked) {
         elCell.textContent = MARKED
         cell.isMarked = true
+        cell.minesRemaining--
+        updateMinesRemaining()
     }
     else {
         elCell.textContent = ''
         cell.isMarked = false
+        cell.minesRemaining++
+        updateMinesRemaining()
     }
 }
 
-function gameOver(){
-    
+function checkGameOver(cell) {
+    if (cell.isMine) elBtn.textContent = LOSE
+    else elBtn.textContent = WIN
+    gGame.isOn = false
+    toggleBoard(gGame.isOn)
+
 }
+
+function toggleBoard(bool) {
+    const elBoard = document.querySelector('.board')
+    if (bool) elBoard.classList.remove('disabled')
+    else elBoard.classList.add('disabled')
+}
+
+function expandReveal(board, elCell, i, j){
+    elCell.textContent = ''
+    const row = i
+    const col = j
+    for (var i = row - 1; i < row + 2; i++) {
+        if (i < 0 || i >= board.length) continue
+        for (var j = col - 1; j < col + 2; j++) {
+            if (i == row && j == col) continue
+            if (j < 0 || j >= board[i].length) continue
+            const elNeg = document.querySelector(`.cell-${i}-${j}`)
+            onCellClicked(elNeg, i, j)
+        }
+    }
+}
+
+function updateMinesRemaining(minesRemaining){
+    const elMinesRemaining = document.querySelector('.mines-remaining')
+    elMinesRemaining.textContent = gGame.minesRemaining
+}
+
+function timer(){
+    elTimer.textContent = gGame.secsPassed
+    gGame.secsPassed++
+}
+

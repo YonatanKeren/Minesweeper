@@ -18,7 +18,32 @@ body {
     width: 30px;  /* Adjust size as needed */
     height: 30px; 
     border: 1px solid black;  /* Adds a visible border */
+    font-family:  'Press Start 2P', cursive;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
 }
+
+.disabled {
+    pointer-events: none;
+    cursor: none;
+}
+
+.uncovered {
+    background-color: rgb(151, 151, 151);
+}
+
+.btn-restart {
+    margin-left: 40px;
+    margin-right: 100px;
+    cursor: pointer;
+}
+
+.mines-remaining {
+    margin-right: 50px;
+}
+
+
 
 
 

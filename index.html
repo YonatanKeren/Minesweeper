@@ -8,11 +8,17 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Minesweeper</title>
   <link rel="stylesheet" href="css/main.css" />
+  <!-- below is a link for fonts for the minesweeper looking numbers-->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body onload="onInit()">
 
-  <h2><button class="btn-restart" onclick="onInit()">🙂</button></h2>
+  <h2>
+    <span class="mines-remaining"></span>
+    <button class="btn-restart" onclick="onInit()">🙂</button>
+    <span class="timer"></span>
+  </h2>
 
   <table class="board-container">
       <tbody class="board">
