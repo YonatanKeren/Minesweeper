@@ -30,6 +30,7 @@ function onInit() {
     gGame.minesRemaining = gLevel.mines
     toggleBoard(gGame.isOn)
     gBoard = buildBoard()
+    //randomMinesPlacement(gLevel.mines, gLevel.size, gBoard)
     setMinesNegsCount(gBoard)
     renderBoard(gBoard)
     updateMinesRemaining()
@@ -40,7 +41,7 @@ function onInit() {
 function buildBoard() {
     const size = gLevel.size
     const board = []
-
+    var placeableMines = gGame.minesRemaining
     for (var i = 0; i < size; i++) {
         board[i] = []
         for (var j = 0; j < size; j++) {
@@ -50,7 +51,9 @@ function buildBoard() {
                 isMine: false,
                 isMarked: false
             }
+            //manually placed mines
             if (i == 0 && j == 1 || i == 2 && j == 3) cell.isMine = true
+            
             board[i][j] = cell
         }
     }
@@ -113,7 +116,7 @@ function onCellClicked(elCell, i, j) {
     elCell.classList.add('uncovered')
     if (cell.isMine) {
         elCell.textContent = MINE
-        return checkGameOver(cell)
+        return checkGameOver(cell, gBoard)
     }
     else {
         if (cell.minesAroundCount === 0) {
@@ -122,6 +125,7 @@ function onCellClicked(elCell, i, j) {
             elCell.textContent = cell.minesAroundCount.toString()
         }
     }
+    return checkGameOver(cell, gBoard)
 }
 
 //disabling context menu and applying cell mark afterwards
@@ -137,23 +141,26 @@ function onCellMarked(elCell, i, j) {
     if (!cell.isMarked) {
         elCell.textContent = MARKED
         cell.isMarked = true
-        cell.minesRemaining--
+        gGame.minesRemaining--
         updateMinesRemaining()
-    }
-    else {
+    } else {
         elCell.textContent = ''
         cell.isMarked = false
-        cell.minesRemaining++
+        gGame.minesRemaining++
         updateMinesRemaining()
     }
 }
 
-function checkGameOver(cell) {
-    if (cell.isMine) elBtn.textContent = LOSE
-    else elBtn.textContent = WIN
+function checkGameOver(cell, board) {
+    var nonMines = gLevel.size * gLevel.size - gLevel.mines
+    if (cell.isMine) {
+        elBtn.textContent = LOSE
+    } else {
+        if (checkUncoveredCount(board) === nonMines) elBtn.textContent = WIN
+        else return
+    }
     gGame.isOn = false
     toggleBoard(gGame.isOn)
-
 }
 
 function toggleBoard(bool) {
@@ -162,7 +169,7 @@ function toggleBoard(bool) {
     else elBoard.classList.add('disabled')
 }
 
-function expandReveal(board, elCell, i, j){
+function expandReveal(board, elCell, i, j) {
     elCell.textContent = ''
     const row = i
     const col = j
@@ -177,13 +184,56 @@ function expandReveal(board, elCell, i, j){
     }
 }
 
-function updateMinesRemaining(minesRemaining){
+function updateMinesRemaining() {
     const elMinesRemaining = document.querySelector('.mines-remaining')
     elMinesRemaining.textContent = gGame.minesRemaining
 }
 
-function timer(){
+function timer() {
     elTimer.textContent = gGame.secsPassed
     gGame.secsPassed++
 }
 
+function checkUncoveredCount(board) {
+    var uncoveredCount = 0
+    for (var i = 0; i < gLevel.size; i++) {
+        for (var j = 0; j < gLevel.size; j++) {
+            if (board[i][j].isMine) continue
+            if (board[i][j].isCovered) continue
+            uncoveredCount++
+        }
+    }
+    return uncoveredCount
+}
+
+//will take gLevel.mines, gLevel.size and gBoard
+// need to implement later the use of the first cell and
+//to make sure the cell can not have mines around him
+// function randomMinesPlacement(mines, boardSize, board) {
+//     var cells = boardSize * boardSize
+//     var arr = []
+//     var mineLocs = []
+//     for (var i = 0; i < boardSize; i++) {
+//         for (var j = 0; j < boardSize; j++) {
+//             const cellLoc = {
+//                 i: i,
+//                 j: j
+//             }
+//             arr.push(cellLoc)
+//         }
+//     }
+//     for (var k = 0; k < mines; k++) {
+//         var loc = getRandNumExc(0, cells)
+//         cells--
+//         mineLocs.push(arr.splice(loc, 1)[0])
+//     }
+//     placeMines(mineLocs, board)
+// }
+//console.log(randomMinesPlacement(gLevel.mines, gLevel.size, gBoard))
+
+// function placeMines(arr, board) {
+//     for (var i = 0; i < arr; i++) {
+//         console.log(board[arr[i].i][arr[i][j]])
+//         board[arr[i].i][arr[i][j]].isMine = true
+//     }
+// }
