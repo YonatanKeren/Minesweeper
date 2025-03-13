@@ -17,31 +17,28 @@ const gGame = {
 }
 
 var gLevel = {
-    size: 5,
+    size: 4,
     mines: 2
 }
 
 var gBoard
 
 function onInit() {
-    elBtn.textContent = PLAYING
-    gGame.secsPassed = 0
-    gGame.isOn = true
-    gGame.minesRemaining = gLevel.mines
+    resetVars()
     toggleBoard(gGame.isOn)
     gBoard = buildBoard()
-    //randomMinesPlacement(gLevel.mines, gLevel.size, gBoard)
     setMinesNegsCount(gBoard)
     renderBoard(gBoard)
     updateMinesRemaining()
 }
+    
 //timer deactivated because its annoying to look at while working
-//setInterval(timer, 1000)
+setInterval(timer, 1000)
 
 function buildBoard() {
     const size = gLevel.size
     const board = []
-    var placeableMines = gGame.minesRemaining
+    // var placeableMines = gGame.minesRemaining
     for (var i = 0; i < size; i++) {
         board[i] = []
         for (var j = 0; j < size; j++) {
@@ -52,11 +49,12 @@ function buildBoard() {
                 isMarked: false
             }
             //manually placed mines
-            if (i == 0 && j == 1 || i == 2 && j == 3) cell.isMine = true
-            
+            //if (i == 0 && j == 1 || i == 2 && j == 3) cell.isMine = true
+
             board[i][j] = cell
         }
     }
+    randomMinesPlacement(gLevel.mines, gLevel.size, board)
     return board
 }
 
@@ -116,7 +114,7 @@ function onCellClicked(elCell, i, j) {
     elCell.classList.add('uncovered')
     if (cell.isMine) {
         elCell.textContent = MINE
-        return checkGameOver(cell, gBoard)
+        return checkGameOver(cell, gBoard, elCell)
     }
     else {
         if (cell.minesAroundCount === 0) {
@@ -151,18 +149,27 @@ function onCellMarked(elCell, i, j) {
     }
 }
 
-function checkGameOver(cell, board) {
+//check if game is over
+function checkGameOver(cell, board, elCell) {
     var nonMines = gLevel.size * gLevel.size - gLevel.mines
     if (cell.isMine) {
         elBtn.textContent = LOSE
+        elCell.classList.add('hit')
+        showAllMines(board)
     } else {
-        if (checkUncoveredCount(board) === nonMines) elBtn.textContent = WIN
+        if (checkUncoveredCount(board) === nonMines) {
+            elBtn.textContent = WIN
+            markAllMines(board)
+            gGame.minesRemaining = 0
+            updateMinesRemaining()
+        }
         else return
     }
     gGame.isOn = false
     toggleBoard(gGame.isOn)
 }
 
+//disables board until game is reset (when win/lose)
 function toggleBoard(bool) {
     const elBoard = document.querySelector('.board')
     if (bool) elBoard.classList.remove('disabled')
@@ -184,16 +191,19 @@ function expandReveal(board, elCell, i, j) {
     }
 }
 
+//updates top left in the game grid based on marked cells
 function updateMinesRemaining() {
     const elMinesRemaining = document.querySelector('.mines-remaining')
     elMinesRemaining.textContent = gGame.minesRemaining
 }
 
+//game timer counter
 function timer() {
-    elTimer.textContent = gGame.secsPassed
     gGame.secsPassed++
+    elTimer.textContent = gGame.secsPassed
 }
 
+//checking uncovered cells for win condition
 function checkUncoveredCount(board) {
     var uncoveredCount = 0
     for (var i = 0; i < gLevel.size; i++) {
@@ -206,34 +216,97 @@ function checkUncoveredCount(board) {
     return uncoveredCount
 }
 
+//used when winning to mark all mines
+function markAllMines(board) {
+    for (var i = 0; i < gLevel.size; i++) {
+        for (var j = 0; j < gLevel.size; j++) {
+            const elCell = document.querySelector(`.cell-${i}-${j}`);
+            if (board[i][j].isMine) elCell.textContent = MARKED
+        }
+    }
+}
+
+//used when losing to show all mines
+function showAllMines(board) {
+    for (var i = 0; i < gLevel.size; i++) {
+        for (var j = 0; j < gLevel.size; j++) {
+            const elCell = document.querySelector(`.cell-${i}-${j}`);
+            if (board[i][j].isMine) {
+                elCell.textContent = MINE
+                elCell.classList.add('uncovered')
+            }
+        }
+    }
+}
+
 //will take gLevel.mines, gLevel.size and gBoard
 // need to implement later the use of the first cell and
 //to make sure the cell can not have mines around him
-// function randomMinesPlacement(mines, boardSize, board) {
-//     var cells = boardSize * boardSize
-//     var arr = []
-//     var mineLocs = []
-//     for (var i = 0; i < boardSize; i++) {
-//         for (var j = 0; j < boardSize; j++) {
-//             const cellLoc = {
-//                 i: i,
-//                 j: j
-//             }
-//             arr.push(cellLoc)
-//         }
-//     }
-//     for (var k = 0; k < mines; k++) {
-//         var loc = getRandNumExc(0, cells)
-//         cells--
-//         mineLocs.push(arr.splice(loc, 1)[0])
-//     }
-//     placeMines(mineLocs, board)
-// }
-//console.log(randomMinesPlacement(gLevel.mines, gLevel.size, gBoard))
+function randomMinesPlacement(mines, boardSize, board) {
+    var cells = boardSize * boardSize
+    var arr = []
+    var mineLocs = []
+    for (var i = 0; i < boardSize; i++) {
+        for (var j = 0; j < boardSize; j++) {
+            const cellLoc = {
+                i: i,
+                j: j
+            }
+            arr.push(cellLoc)
+        }
+    }
+    for (var k = 0; k < mines; k++) {
+        var loc = getRandNumExc(0, cells)
+        cells--
+        mineLocs.push(arr.splice(loc, 1)[0])
+    }
+    placeMines(mineLocs, board)
+    return board
+}
 
-// function placeMines(arr, board) {
-//     for (var i = 0; i < arr; i++) {
-//         console.log(board[arr[i].i][arr[i][j]])
-//         board[arr[i].i][arr[i][j]].isMine = true
-//     }
-// }
+//takes the random locations from randomMinesPlacement and
+//places them on the board
+function placeMines(arr, board) {
+    for (var k = 0; k < arr.length; k++) {
+        board[arr[k].i][arr[k].j].isMine = true
+    }
+}
+
+//open/close difficulty selector
+function toggleModal() {
+    const elModal = document.querySelector('.modal')
+    if (elModal.style.display === 'block') elModal.style.display = 'none'
+    else {
+        elModal.style.display = 'block'
+    }
+}
+
+//applies difficulty based on user selection
+function selectDifficulty(difficulty) {
+    if (difficulty === 'beginner') {
+        gLevel.mines = 2
+        gLevel.size = 4
+        onInit()
+    } else if (difficulty === 'medium') {
+        gLevel.mines = 14
+        gLevel.size = 8
+        onInit()
+    } else if (difficulty === 'expert') {
+        gLevel.mines = 32
+        gLevel.size = 12
+        onInit()
+
+    }
+    toggleModal()
+}
+
+//resetting some variables on game reset,
+//function to decrease clutter in onInit()
+function resetVars(){
+    elTimer.textContent = '0'
+    elBtn.textContent = PLAYING
+    gGame.secsPassed = 0
+    gGame.isOn = true
+    gGame.minesRemaining = gLevel.mines
+}
+

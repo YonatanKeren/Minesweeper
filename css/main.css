@@ -1,26 +1,53 @@
 body {
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
+    margin-top: 50px;
+    margin-left: 100px;
+    margin-right: 100px;
+    padding: 10px;
     background: rgb(247, 247, 247);
     text-align: center;
 }
 
-.board-container {
-    margin: auto;
+.difficulty {
+    margin-right: 30%;
 }
 
-.board {
+.grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    margin-right: 600px;
+    margin-left: 600px;
+    background-color: rgb(185, 185, 185);
+}
+
+.misc {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 20px;
+}
+
+div:first-child {
+    padding: 10px;
+}
+
+.board-container {
+    display: inline-block;
+    margin: auto;
     border-collapse: collapse;
 }
 
-.cell{
-    width: 30px;  /* Adjust size as needed */
-    height: 30px; 
-    border: 1px solid black;  /* Adds a visible border */
-    font-family:  'Press Start 2P', cursive;
+.cell {
+    width: 30px;
+    height: 30px;
+    border: 0.1px solid black;
+    font-family: 'Press Start 2P', cursive;
     font-size: 15px;
     font-weight: bold;
+    box-shadow: inset -2px -2px 2px #ffffff,
+        inset 2px 2px 2px #808080;
     cursor: pointer;
 }
 
@@ -31,22 +58,73 @@ body {
 
 .uncovered {
     background-color: rgb(151, 151, 151);
+    box-shadow: none;
+    border: 1px solid #707070;
+}
+
+.uncovered.hit {
+    background-color: red;
 }
 
 .btn-restart {
-    margin-left: 40px;
-    margin-right: 100px;
     cursor: pointer;
+    background-color: rgb(194, 194, 194);
+    text-align: center;
 }
 
 .mines-remaining {
-    margin-right: 50px;
+    text-align: center;
+    padding: 2px;
+    width: 40px;
+    box-shadow: inset -2px -2px 2px #ffffff,
+        inset 2px 2px 2px #808080;
+    background-color: black;
+    color: red;
 }
 
+.timer {
+    text-align: center;
+    padding: 2px;
+    width: 40px;
+    box-shadow: inset -2px -2px 2px #ffffff,
+        inset 2px 2px 2px #808080;
+    background-color: black;
+    color: red;
+}
 
+.modal {
+    display: none;
+    border: solid 3px grey;
+    width: 300px;
+    height: 100px;
+    background-color: rgb(222, 226, 228);
+    color: black;
+    font-size: 32px;
+    position: absolute;
+    top: 200px;
+    left: 700px;
+}
 
+.msg {
+    font-size: medium;
+}
 
+.modal .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
 
+.modal .beginner {
+    cursor: pointer;
+}
 
+.modal .medium {
+    cursor: pointer;
+}
 
+.modal .expert {
+    cursor: pointer;
+}
 

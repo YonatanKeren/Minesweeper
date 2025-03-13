@@ -14,18 +14,35 @@
 
 <body onload="onInit()">
 
-  <h2>
-    <span class="mines-remaining"></span>
-    <button class="btn-restart" onclick="onInit()">🙂</button>
-    <span class="timer"></span>
-  </h2>
+  <h1>
+    <div>
+      <button class="difficulty" onclick="toggleModal()">Difficulty</button>
+      <div class ="modal">
+        <h2 class="msg">Select difficulty</h2>
+        <button class="beginner" onclick="selectDifficulty('beginner')">Beginner</button>
+        <button class="medium" onclick="selectDifficulty('medium')">Medium</button>
+        <button class="expert" onclick="selectDifficulty('expert')">Expert</button>
+        <button class="close" onclick="toggleModal()">X</button>
+      </div>
+    </div>
 
-  <table class="board-container">
+  </h1>
+
+  <div class="grid">
+
+    <div class="misc">
+      <span class="mines-remaining"></span>
+      <button class="btn-restart" onclick="onInit()">🙂</button>
+      <span class="timer"></span>
+    </div>
+
+    <table class="board-container">
       <tbody class="board">
 
       </tbody>
-  </table>
+    </table>
 
+  </div>
 
   <script src="js/util.js"></script>
   <script src="js/main.js"></script>
